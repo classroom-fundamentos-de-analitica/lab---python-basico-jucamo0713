@@ -11,6 +11,18 @@ Utilice el archivo `data.csv` para resolver las preguntas.
 
 
 """
+import fileinput
+import glob
+from itertools import groupby
+
+
+def load_input(input_file: str) -> list[list]:
+    filenames = glob.glob(input_file)
+    sequence = []
+    with fileinput.input(files=filenames) as f:
+        for line in f:
+            sequence.append(line.split('	'))
+    return sequence
 
 
 def pregunta_01():
@@ -21,7 +33,8 @@ def pregunta_01():
     214
 
     """
-    return
+    data = load_input('data.csv')
+    return sum(map(lambda x: int(x[1]), data))
 
 
 def pregunta_02():
@@ -39,7 +52,15 @@ def pregunta_02():
     ]
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = {}
+    for k, g in groupby(data, lambda x: x[0]):
+        for _ in g:
+            if k in new_data:
+                new_data[k] += 1
+            else:
+                new_data[k] = 1
+    return sorted(new_data.items(), key=lambda x: x[0])
 
 
 def pregunta_03():
@@ -57,7 +78,15 @@ def pregunta_03():
     ]
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = {}
+    for k, g in groupby(data, lambda x: x[0]):
+        for x in g:
+            if k in new_data:
+                new_data[k] += int(x[1])
+            else:
+                new_data[k] = int(x[1])
+    return sorted(new_data.items(), key=lambda x: x[0])
 
 
 def pregunta_04():
@@ -82,7 +111,15 @@ def pregunta_04():
     ]
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = {}
+    for k, g in groupby(data, lambda x: x[2].split('-')[1]):
+        for _ in g:
+            if k in new_data:
+                new_data[k] += 1
+            else:
+                new_data[k] = 1
+    return sorted(new_data.items(), key=lambda x: x[0])
 
 
 def pregunta_05():
@@ -100,7 +137,18 @@ def pregunta_05():
     ]
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = {}
+    for k, g in groupby(data, lambda x: x[0]):
+        for x in g:
+            if k in new_data:
+                new_data[k][0] = max(int(x[1]), new_data[k][0])
+                new_data[k][1] = min(int(x[1]), new_data[k][1])
+            else:
+                new_data[k] = [int(x[1]), int(x[1])]
+    return sorted(map(lambda x: (x[0], x[1][0], x[1][1]), new_data.items()),
+                  key=lambda
+                      x: x[0])
 
 
 def pregunta_06():
@@ -125,7 +173,22 @@ def pregunta_06():
     ]
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = []
+    for e in data:
+        for i in map(lambda y: y.split(':'), e[4].split(',')):
+            new_data.append([*e, i[0], int(i[1])])
+    response = {}
+    for k, g in groupby(new_data, lambda x: x[5]):
+        for x in g:
+            if k in response:
+                response[k][0] = min(x[6], response[k][0])
+                response[k][1] = max(x[6], response[k][1])
+            else:
+                response[k] = [x[6], x[6]]
+    return sorted(map(lambda x: (x[0], x[1][0], x[1][1]), response.items()),
+                  key=lambda
+                      x: x[0])
 
 
 def pregunta_07():
@@ -149,7 +212,16 @@ def pregunta_07():
     ]
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = {}
+    for k, g in groupby(data, lambda x: x[1]):
+        k = int(k)
+        for x in g:
+            if k in new_data:
+                new_data[k].append(x[0])
+            else:
+                new_data[k] = [x[0]]
+    return sorted(new_data.items(), key=lambda x: x[0])
 
 
 def pregunta_08():
@@ -174,8 +246,17 @@ def pregunta_08():
     ]
 
     """
-    return
-
+    data = load_input('data.csv')
+    new_data = {}
+    for k, g in groupby(data, lambda x: x[1]):
+        k = int(k)
+        for x in g:
+            if k in new_data:
+                new_data[k].add(x[0])
+            else:
+                new_data[k] = set(x[0])
+    return sorted(map(lambda x: (x[0], sorted(x[1])),new_data.items()),
+                  key=lambda x:x[0])
 
 def pregunta_09():
     """
@@ -197,7 +278,20 @@ def pregunta_09():
     }
 
     """
-    return
+
+    data = load_input('data.csv')
+    new_data = []
+    for e in data:
+        for i in map(lambda y: y.split(':'), e[4].split(',')):
+            new_data.append([*e, i[0], int(i[1])])
+    response = {}
+    for k, g in groupby(new_data, lambda x: x[5]):
+        for _ in g:
+            if k in response:
+                response[k] += 1
+            else:
+                response[k] = 1
+    return response
 
 
 def pregunta_10():
@@ -218,7 +312,13 @@ def pregunta_10():
 
 
     """
-    return
+    data = load_input('data.csv')
+    return list(map(lambda x: (
+        x[0],
+        len(x[3].split(',')),
+        len(x[4].split(','))
+    ),
+               data))
 
 
 def pregunta_11():
@@ -239,7 +339,19 @@ def pregunta_11():
 
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = []
+    for e in data:
+        for i in e[3].split(','):
+            new_data.append([*e, i])
+    response = {}
+    for k, g in groupby(new_data, lambda x: x[5]):
+        for x in g:
+            if k in response:
+                response[k] += int(x[1])
+            else:
+                response[k] = int(x[1])
+    return response
 
 
 def pregunta_12():
@@ -257,4 +369,16 @@ def pregunta_12():
     }
 
     """
-    return
+    data = load_input('data.csv')
+    new_data = []
+    for e in data:
+        for i in map(lambda y: y.split(':'), e[4].split(',')):
+            new_data.append([*e, i[0], int(i[1])])
+    response = {}
+    for k, g in groupby(new_data, lambda x: x[0]):
+        for x in g:
+            if k in response:
+                response[k] += x[6]
+            else:
+                response[k] = x[6]
+    return response
